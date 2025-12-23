@@ -32,7 +32,7 @@ docker-compose up --build
 - Orders Service (инстанс 2): http://localhost:5004
 - Orders Service (инстанс 3): http://localhost:5005
 - RabbitMQ Management: http://localhost:15672 (guest/guest)
-- Redis: localhost:6379
+- Redis: localhost:6380
 
 ### Использование
 
