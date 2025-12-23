@@ -1,0 +1,524 @@
+<!DOCTYPE html>
+<html lang="ru">
+
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Гоzон - Интернет-магазин</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            padding: 30px;
+        }
+
+        h1 {
+            color: #333;
+            margin-bottom: 30px;
+            text-align: center;
+            font-size: 2.5em;
+        }
+
+        .section {
+            margin-bottom: 40px;
+            padding: 20px;
+            background: #f8f9fa;
+            border-radius: 10px;
+        }
+
+        .section h2 {
+            color: #667eea;
+            margin-bottom: 20px;
+            font-size: 1.8em;
+        }
+
+        .form-group {
+            margin-bottom: 15px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 5px;
+            color: #555;
+            font-weight: 600;
+        }
+
+        input,
+        select,
+        textarea {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #ddd;
+            border-radius: 8px;
+            font-size: 16px;
+            transition: border-color 0.3s;
+        }
+
+        input:focus,
+        select:focus,
+        textarea:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+
+        button {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            padding: 12px 30px;
+            border-radius: 8px;
+            font-size: 16px;
+            cursor: pointer;
+            transition: transform 0.2s, box-shadow 0.2s;
+            font-weight: 600;
+        }
+
+        button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+        }
+
+        button:active {
+            transform: translateY(0);
+        }
+
+        .result {
+            margin-top: 20px;
+            padding: 15px;
+            background: #e8f5e9;
+            border-radius: 8px;
+            border-left: 4px solid #4caf50;
+        }
+
+        .error {
+            background: #ffebee;
+            border-left-color: #f44336;
+        }
+
+        .orders-list {
+            display: grid;
+            gap: 15px;
+        }
+
+        .order-card {
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            border-left: 4px solid #667eea;
+        }
+
+        .order-card h3 {
+            color: #333;
+            margin-bottom: 10px;
+        }
+
+        .status {
+            display: inline-block;
+            padding: 5px 15px;
+            border-radius: 20px;
+            font-weight: 600;
+            margin-top: 10px;
+        }
+
+        .status.NEW {
+            background: #fff3cd;
+            color: #856404;
+        }
+
+        .status.FINISHED {
+            background: #d4edda;
+            color: #155724;
+        }
+
+        .status.CANCELLED {
+            background: #f8d7da;
+            color: #721c24;
+        }
+
+        .toast {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: #333;
+            color: white;
+            padding: 15px 25px;
+            border-radius: 8px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+            z-index: 1000;
+            animation: slideIn 0.3s ease-out;
+        }
+
+        @@keyframes slideIn {
+            from {
+                transform: translateX(400px);
+                opacity: 0;
+            }
+
+            to {
+                transform: translateX(0);
+                opacity: 1;
+            }
+        }
+
+        .balance-display {
+            font-size: 2em;
+            color: #667eea;
+            font-weight: bold;
+            text-align: center;
+            padding: 20px;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <h1>🛒 Гоzон - Интернет-магазин</h1>
+
+        <div class="section">
+            <h2>💳 Управление счетом</h2>
+            <div class="form-group">
+                <label>User ID:</label>
+                <input type="text" id="userId"
+                    placeholder="Введите User ID (например: 123e4567-e89b-12d3-a456-426614174000)" />
+            </div>
+            <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px;">
+                <button onclick="createAccount()">Создать счет</button>
+                <button onclick="topUpAccount()">Пополнить счет</button>
+                <button onclick="getBalance()">Показать баланс</button>
+            </div>
+            <div id="accountResult"></div>
+        </div>
+
+        <div class="section">
+            <h2>📦 Управление заказами</h2>
+            <div class="form-group">
+                <label>Сумма заказа:</label>
+                <input type="number" id="orderAmount" step="0.01" placeholder="0.00" />
+            </div>
+            <div class="form-group">
+                <label>Описание:</label>
+                <textarea id="orderDescription" rows="3" placeholder="Описание заказа"></textarea>
+            </div>
+            <button onclick="createOrder()">Создать заказ</button>
+            <div id="orderResult"></div>
+        </div>
+
+        <div class="section">
+            <h2>📋 Мои заказы</h2>
+            <button onclick="loadOrders()">Обновить список</button>
+            <div id="ordersList" class="orders-list"></div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/@@microsoft/signalr@7.0.0/dist/browser/signalr.min.js"></script>
+    <script>
+        const getApiBase = () => {
+            const port = window.location.port;
+            if (port === '5003' || port === '') {
+                return window.location.protocol + '//' + window.location.hostname + ':5000';
+            }
+            return window.location.origin.replace(':' + port, ':5000');
+        };
+        const getWsBase = () => {
+            return getApiBase();
+        };
+        const API_BASE = getApiBase();
+        const WS_BASE = getWsBase();
+        let connection = null;
+        let currentOrderId = null;
+
+        function showToast(message, type = 'info') {
+            const toast = document.createElement('div');
+            toast.className = 'toast';
+            toast.textContent = message;
+            document.body.appendChild(toast);
+            setTimeout(() => {
+                toast.style.animation = 'slideIn 0.3s ease-out reverse';
+                setTimeout(() => toast.remove(), 300);
+            }, 3000);
+        }
+
+        function getUserId() {
+            const inputValue = document.getElementById('userId').value.trim();
+            if (!inputValue) {
+                showToast('Пожалуйста, введите User ID', 'error');
+                return null;
+            }
+            const guidRegex = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+            if (guidRegex.test(inputValue)) {
+                return inputValue.toLowerCase();
+            }
+
+            try {
+                function stringToGuid(str) {
+                    let hash1 = 0, hash2 = 0, hash3 = 0;
+                    for (let i = 0; i < str.length; i++) {
+                        const char = str.charCodeAt(i);
+                        hash1 = ((hash1 << 5) - hash1) + char;
+                        hash1 = hash1 & hash1;
+                        hash2 = ((hash2 << 3) - hash2) + char * 7;
+                        hash2 = hash2 & hash2;
+                        hash3 = ((hash3 << 7) - hash3) + char * 11;
+                        hash3 = hash3 & hash3;
+                    }
+
+                    const part1 = Math.abs(hash1).toString(16).padStart(8, '0').substring(0, 8);
+                    const part2 = Math.abs(hash1 * 31 + str.length).toString(16).padStart(4, '0').substring(0, 4);
+                    const part3 = ('4' + Math.abs(hash2 * 17).toString(16).padStart(3, '0')).substring(0, 4);
+                    const variant = ['8', '9', 'a', 'b'][Math.abs(hash3) % 4];
+                    const part4 = (variant + Math.abs(hash2 * 7).toString(16).padStart(3, '0')).substring(0, 4);
+                    const part5 = (Math.abs(hash1 * 13).toString(16) + Math.abs(hash2 * 19).toString(16) + Math.abs(hash3 * 23).toString(16)).padStart(12, '0').substring(0, 12);
+
+                    return `${part1}-${part2}-${part3}-${part4}-${part5}`.toLowerCase();
+                }
+
+                const guid = stringToGuid(inputValue);
+                console.log(`Converted "${inputValue}" to GUID: ${guid}`);
+
+                if (!guidRegex.test(guid)) {
+                    throw new Error('Generated GUID is invalid');
+                }
+
+                return guid;
+            } catch (e) {
+                console.error('Error converting to GUID:', e);
+                showToast('Ошибка конвертации User ID. Введите GUID формат (например: 123e4567-e89b-12d3-a456-426614174000)', 'error');
+                return null;
+            }
+        }
+
+        async function createAccount() {
+            const userId = getUserId();
+            if (!userId) return;
+
+            try {
+                const requestBody = { userId: userId };
+                console.log('Sending request:', JSON.stringify(requestBody));
+                const response = await fetch(`${API_BASE}/api/payments/accounts`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(requestBody)
+                });
+
+                const result = await response.json();
+                if (response.ok) {
+                    document.getElementById('accountResult').innerHTML =
+                        `<div class="result">Счет успешно создан!</div>`;
+                    showToast('Счет создан успешно!');
+                } else {
+                    let errorMsg = result.title || 'Ошибка';
+                    if (result.errors) {
+                        const errors = Object.values(result.errors).flat().join(', ');
+                        errorMsg = errors || errorMsg;
+                    }
+                    document.getElementById('accountResult').innerHTML =
+                        `<div class="result error">${errorMsg}</div>`;
+                }
+            } catch (error) {
+                document.getElementById('accountResult').innerHTML =
+                    `<div class="result error">Ошибка: ${error.message}</div>`;
+            }
+        }
+
+        async function topUpAccount() {
+            const userId = getUserId();
+            if (!userId) return;
+
+            const amount = prompt('Введите сумму пополнения:');
+            if (!amount || isNaN(amount) || parseFloat(amount) <= 0) {
+                showToast('Введите корректную сумму', 'error');
+                return;
+            }
+
+            try {
+                const requestBody = { userId: userId, amount: parseFloat(amount) };
+                console.log('Sending topup request:', JSON.stringify(requestBody));
+                const response = await fetch(`${API_BASE}/api/payments/accounts/topup`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(requestBody)
+                });
+
+                if (response.ok) {
+                    document.getElementById('accountResult').innerHTML =
+                        `<div class="result">Счет пополнен на ${amount} руб.</div>`;
+                    showToast(`Счет пополнен на ${amount} руб.`);
+                } else {
+                    const result = await response.json();
+                    document.getElementById('accountResult').innerHTML =
+                        `<div class="result error">${result.title || 'Ошибка'}</div>`;
+                }
+            } catch (error) {
+                document.getElementById('accountResult').innerHTML =
+                    `<div class="result error">Ошибка: ${error.message}</div>`;
+            }
+        }
+
+        async function getBalance() {
+            const userId = getUserId();
+            if (!userId) return;
+
+            try {
+                const response = await fetch(`${API_BASE}/api/payments/accounts/${userId}/balance`);
+                const result = await response.json();
+                if (response.ok) {
+                    document.getElementById('accountResult').innerHTML =
+                        `<div class="result"><div class="balance-display">Баланс: ${result.balance} руб.</div></div>`;
+                } else {
+                    document.getElementById('accountResult').innerHTML =
+                        `<div class="result error">Счет не найден</div>`;
+                }
+            } catch (error) {
+                document.getElementById('accountResult').innerHTML =
+                    `<div class="result error">Ошибка: ${error.message}</div>`;
+            }
+        }
+
+        async function createOrder() {
+            const userId = getUserId();
+            if (!userId) return;
+
+            const amount = parseFloat(document.getElementById('orderAmount').value);
+            const description = document.getElementById('orderDescription').value;
+
+            if (!amount || amount <= 0) {
+                showToast('Введите корректную сумму заказа', 'error');
+                return;
+            }
+
+            if (!description.trim()) {
+                showToast('Введите описание заказа', 'error');
+                return;
+            }
+
+            try {
+                const requestBody = { userId: userId, amount: amount, description: description };
+                console.log('Sending create order request:', JSON.stringify(requestBody));
+                const response = await fetch(`${API_BASE}/api/orders`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(requestBody)
+                });
+
+                const result = await response.json();
+                if (response.ok) {
+                    document.getElementById('orderResult').innerHTML =
+                        `<div class="result">Заказ создан! ID: ${result.id}</div>`;
+                    currentOrderId = result.id;
+                    connectToOrderStatus(result.id);
+                    showToast('Заказ создан! Ожидайте обработки платежа...');
+                    setTimeout(loadOrders, 1000);
+                } else {
+                    let errorMsg = result.title || 'Ошибка создания заказа';
+                    if (result.errors) {
+                        const errors = Object.values(result.errors).flat().join(', ');
+                        errorMsg = errors || errorMsg;
+                    }
+                    document.getElementById('orderResult').innerHTML =
+                        `<div class="result error">${errorMsg}</div>`;
+                }
+            } catch (error) {
+                document.getElementById('orderResult').innerHTML =
+                    `<div class="result error">Ошибка: ${error.message}</div>`;
+            }
+        }
+
+        async function loadOrders() {
+            const userId = getUserId();
+            if (!userId) return;
+
+            try {
+                const response = await fetch(`${API_BASE}/api/orders?userId=${userId}`);
+                if (!response.ok) {
+                    const error = await response.json().catch(() => ({ title: 'Ошибка загрузки заказов' }));
+                    document.getElementById('ordersList').innerHTML =
+                        `<div class="result error">${error.title || 'Ошибка загрузки заказов'}</div>`;
+                    return;
+                }
+
+                const data = await response.json();
+                const orders = Array.isArray(data) ? data : [];
+
+                const ordersList = document.getElementById('ordersList');
+                if (orders.length === 0) {
+                    ordersList.innerHTML = '<div class="result">Заказов нет</div>';
+                    return;
+                }
+
+                ordersList.innerHTML = orders.map(order => `
+                    <div class="order-card">
+                        <h3>Заказ #${order.id.substring(0, 8)}</h3>
+                        <p><strong>Сумма:</strong> ${order.amount} руб.</p>
+                        <p><strong>Описание:</strong> ${order.description}</p>
+                        <p><strong>Дата:</strong> ${new Date(order.createdAt).toLocaleString('ru-RU')}</p>
+                        <div class="status ${order.status}">${getStatusText(order.status)}</div>
+                    </div>
+                `).join('');
+            } catch (error) {
+                document.getElementById('ordersList').innerHTML =
+                    `<div class="result error">Ошибка загрузки заказов: ${error.message}</div>`;
+            }
+        }
+
+        function getStatusText(status) {
+            const statusMap = {
+                'NEW': 'В обработке',
+                'FINISHED': 'Оплачен',
+                'CANCELLED': 'Отменен'
+            };
+            return statusMap[status] || status;
+        }
+
+        function connectToOrderStatus(orderId) {
+            if (connection) {
+                connection.stop();
+            }
+
+            connection = new signalR.HubConnectionBuilder()
+                .withUrl(`${WS_BASE}/orderStatusHub`)
+                .build();
+
+            connection.start().then(() => {
+                connection.invoke('SubscribeToOrder', orderId);
+            }).catch(err => {
+                console.error('Ошибка подключения к WebSocket:', err);
+            });
+
+            connection.on('OrderStatusChanged', (data) => {
+                const statusText = data.status === 'FINISHED' ? 'Оплачен' : 'Отменен';
+                showToast(`Статус заказа изменен: ${statusText}`, data.status === 'FINISHED' ? 'success' : 'error');
+
+                if (Notification.permission === 'granted') {
+                    new Notification('🛒 Гоzон', {
+                        body: `Заказ #${orderId.substring(0, 8)}: ${statusText}`
+                    });
+                }
+
+                loadOrders();
+            });
+        }
+
+        if ('Notification' in window && Notification.permission === 'default') {
+            Notification.requestPermission();
+        }
+    </script>
+</body>
+
+</html>
